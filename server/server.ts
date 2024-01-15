@@ -2,7 +2,6 @@
 import 'dotenv/config';
 import pg from 'pg';
 import express from 'express';
-// import { readFile } from 'node:fs/promises';
 import { ClientError, errorMiddleware } from './lib/index.js';
 
 const app = express();
@@ -47,6 +46,35 @@ app.post('/api/entries', async (req, res, next) => {
     const result = await db.query(sql, params);
     const entry = result.rows[0];
     res.status(201).json(entry);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.delete('api/entries/:entryId', async (req, res, next) => {
+  try {
+    const entryId = Number(req.params.entryId);
+
+    if (!Number.isInteger(entryId) || entryId <= 0) {
+      throw new ClientError(400, '"entryId" must be a positive integer');
+    }
+
+    const sql = `
+    delete
+    from "entries"
+    where "entryId = $1
+    returning *
+    `;
+
+    const params = [entryId];
+    const result = await db.query(sql, params);
+    const entry = result.rows[0];
+
+    if (!entryId) {
+      throw new ClientError(404, `Cannot find grade with 'entryId' ${entryId}`);
+    }
+
+    res.json(`entryId number ${entryId} has been deleted`);
   } catch (err) {
     next(err);
   }

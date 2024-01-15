@@ -19,9 +19,12 @@ export default function EntryForm({ entry, onSubmit }: Props) {
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const newEntry = { title, photoUrl, notes };
+
     if (entry) {
       updateEntry({ ...entry, ...newEntry });
     } else {
+      console.log('this is where we should be');
+      console.log(newEntry);
       addEntry(newEntry);
     }
     onSubmit();

@@ -1,5 +1,5 @@
 import { FaPencilAlt } from 'react-icons/fa';
-import { Entry } from './data';
+import { Entry, readEntries } from './data';
 import { useEffect, useState } from 'react';
 
 type Props = {
@@ -13,13 +13,8 @@ export default function EntryList({ onCreate, onEdit }: Props) {
   useEffect(() => {
     async function getEntries() {
       try {
-        const res = await fetch('/api/entries');
-        if (!res.ok) {
-          throw new Error(`Error, failed to fetch ${res.status}`);
-        }
-        const entries = await res.json();
-        setEntries(entries);
-        console.log(entries);
+        const results = await readEntries();
+        setEntries(results);
       } catch (err: unknown) {
         setError(err);
       }

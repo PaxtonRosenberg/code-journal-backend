@@ -22,15 +22,26 @@ if (localData) {
   data = JSON.parse(localData);
 }
 
-export function readEntries() {}
+export async function readEntries() {
+  const res = await fetch('/api/entries');
+  if (!res.ok) {
+    throw new Error(`Error, failed to fetch ${res.status}`);
+  }
+  const entries = await res.json();
+  return entries;
+}
 
-export function addEntry(entry: UnsavedEntry): Entry {
-  const newEntry = {
-    ...entry,
-    entryId: data.nextEntryId++,
-  };
-  data.entries.unshift(newEntry);
-  return newEntry;
+export async function addEntry(entry: UnsavedEntry): Entry {
+  const res = await fetch('/api/entries', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(entry),
+  });
+  if (!res.ok) {
+    throw new Error(`Error, failed to fetch ${res.status}`);
+  }
 }
 
 export function updateEntry(entry: Entry): Entry {
