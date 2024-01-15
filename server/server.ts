@@ -85,7 +85,7 @@ app.put('/api/entries/:entryId', async (req, res, next) => {
     const entryId = Number(req.params.entryId);
     const title = req.body.title;
     const photoUrl = req.body.photoUrl;
-    const notes = Number(req.body.notes);
+    const notes = req.body.notes;
     if (!Number.isInteger(entryId) || entryId <= 0) {
       throw new ClientError(400, 'entryId must be a number greater than 0');
     }

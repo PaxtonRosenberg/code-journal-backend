@@ -44,11 +44,18 @@ export async function addEntry(entry: UnsavedEntry): Entry {
   }
 }
 
-export function updateEntry(entry: Entry): Entry {
-  const newEntries = data.entries.map((e) =>
-    e.entryId === entry.entryId ? entry : e
-  );
-  data.entries = newEntries;
+export async function updateEntry(entry: Entry): Entry {
+  const res = await fetch(`/api/entries/${entry.entryId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(entry),
+  });
+  if (!res.ok) {
+    throw new Error(`Error, failed to fetch ${res.status}`);
+  }
+  console.log(entry);
   return entry;
 }
 
