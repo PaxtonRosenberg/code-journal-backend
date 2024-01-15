@@ -1,12 +1,39 @@
 import { FaPencilAlt } from 'react-icons/fa';
-import { Entry, readEntries } from './data';
+import { Entry } from './data';
+import { useEffect, useState } from 'react';
 
 type Props = {
   onCreate: () => void;
   onEdit: (entry: Entry) => void;
 };
 export default function EntryList({ onCreate, onEdit }: Props) {
-  const entries = readEntries();
+  const [entries, setEntries] = useState([]);
+  const [error, setError] = useState<unknown>();
+
+  useEffect(() => {
+    async function getEntries() {
+      try {
+        const res = await fetch('/api/entries');
+        if (!res.ok) {
+          throw new Error(`Error, failed to fetch ${res.status}`);
+        }
+        const entries = await res.json();
+        setEntries(entries);
+        console.log(entries);
+      } catch (err: unknown) {
+        setError(err);
+      }
+    }
+    getEntries();
+  }, []);
+
+  if (error) {
+    console.error('Fetch error:', error);
+    return (
+      <p>Error! {error instanceof Error ? error.message : 'Unknown Error'}</p>
+    );
+  }
+
   return (
     <div className="container">
       <div className="row">
@@ -25,7 +52,7 @@ export default function EntryList({ onCreate, onEdit }: Props) {
       <div className="row">
         <div className="column-full">
           <ul className="entry-ul">
-            {entries.map((entry) => (
+            {entries.map((entry: Entry) => (
               <EntryCard key={entry.entryId} entry={entry} onEdit={onEdit} />
             ))}
           </ul>

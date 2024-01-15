@@ -22,9 +22,7 @@ if (localData) {
   data = JSON.parse(localData);
 }
 
-export function readEntries(): Entry[] {
-  return data.entries;
-}
+export function readEntries() {}
 
 export function addEntry(entry: UnsavedEntry): Entry {
   const newEntry = {
