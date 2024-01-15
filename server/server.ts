@@ -51,7 +51,7 @@ app.post('/api/entries', async (req, res, next) => {
   }
 });
 
-app.delete('api/entries/:entryId', async (req, res, next) => {
+app.delete('/api/entries/:entryId', async (req, res, next) => {
   try {
     const entryId = Number(req.params.entryId);
 
@@ -62,7 +62,7 @@ app.delete('api/entries/:entryId', async (req, res, next) => {
     const sql = `
     delete
     from "entries"
-    where "entryId = $1
+    where "entryId" = $1
     returning *
     `;
 
@@ -75,6 +75,31 @@ app.delete('api/entries/:entryId', async (req, res, next) => {
     }
 
     res.json(`entryId number ${entryId} has been deleted`);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.put('/api/entries/:entryId', async (req, res, next) => {
+  try {
+    const entryId = Number(req.params.entryId);
+    const title = req.body.title;
+    const photoUrl = req.body.photoUrl;
+    const notes = Number(req.body.notes);
+    if (!Number.isInteger(entryId) || entryId <= 0) {
+      throw new ClientError(400, 'entryId must be a number greater than 0');
+    }
+    const sql = `
+      update "entries"
+      set "title" = $1,
+          "photoUrl" = $2,
+          "notes" = $3
+      where "entryId" = $4
+      returning *
+      `;
+    const params = [title, photoUrl, notes, entryId];
+    const result = await db.query(sql, params);
+    res.json(result.rows[0]);
   } catch (err) {
     next(err);
   }
