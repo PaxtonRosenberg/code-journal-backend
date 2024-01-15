@@ -70,7 +70,7 @@ app.delete('api/entries/:entryId', async (req, res, next) => {
     const result = await db.query(sql, params);
     const entry = result.rows[0];
 
-    if (!entryId) {
+    if (!entry) {
       throw new ClientError(404, `Cannot find grade with 'entryId' ${entryId}`);
     }
 
