@@ -30,16 +30,12 @@ app.get('/api/entries', async (req, res, next) => {
   }
 });
 
-interface Entry {
-  title: string;
-  photoUrl: string;
-  notes: string;
-}
-
 app.post('/api/entries', async (req, res, next) => {
   try {
-    const newEntry: Entry = req.body;
-    if (!newEntry || !newEntry.title || newEntry.photoUrl || newEntry.notes) {
+    const title = req.body.title;
+    const notes = req.body.notes;
+    const photoUrl = req.body.photoUrl;
+    if (!title || !photoUrl || !notes) {
       throw new ClientError(400, 'No name provided');
     }
     const sql = `
@@ -47,10 +43,16 @@ app.post('/api/entries', async (req, res, next) => {
     values ($1, $2, $3)
     returning *;
     `;
+    const params = [title, notes, photoUrl];
+    const result = await db.query(sql, params);
+    const entry = result.rows[0];
+    res.status(201).json(entry);
   } catch (err) {
-    console.error(err);
+    next(err);
   }
 });
+
+app.use(errorMiddleware);
 
 app.listen(process.env.PORT, () => {
   console.log(`express server listening on port ${process.env.PORT}`);
