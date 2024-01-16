@@ -31,7 +31,7 @@ export async function readEntries() {
   return entries;
 }
 
-export async function addEntry(entry: UnsavedEntry): Entry {
+export async function addEntry(entry: UnsavedEntry): Promise<void> {
   const res = await fetch('/api/entries', {
     method: 'POST',
     headers: {
@@ -44,7 +44,7 @@ export async function addEntry(entry: UnsavedEntry): Entry {
   }
 }
 
-export async function updateEntry(entry: Entry): Entry {
+export async function updateEntry(entry: Entry): Promise<Entry> {
   const res = await fetch(`/api/entries/${entry.entryId}`, {
     method: 'PUT',
     headers: {
@@ -55,11 +55,10 @@ export async function updateEntry(entry: Entry): Entry {
   if (!res.ok) {
     throw new Error(`Error, failed to fetch ${res.status}`);
   }
-  console.log(entry);
   return entry;
 }
 
-export async function removeEntry(entryId: number): void {
+export async function removeEntry(entryId: number): Promise<void> {
   const res = await fetch(`/api/entries/${entryId}`, {
     method: 'DELETE',
     headers: {
@@ -70,8 +69,3 @@ export async function removeEntry(entryId: number): void {
     throw new Error(`Error, failed to fetch ${res.status}`);
   }
 }
-
-// const updatedArray = data.entries.filter(
-//   (entry) => entry.entryId !== entryId
-// );
-// data.entries = updatedArray;
