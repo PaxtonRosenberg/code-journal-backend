@@ -22,30 +22,50 @@ if (localData) {
   data = JSON.parse(localData);
 }
 
-export function readEntries(): Entry[] {
-  return data.entries;
+export async function readEntries() {
+  const res = await fetch('/api/entries');
+  if (!res.ok) {
+    throw new Error(`Error, failed to fetch ${res.status}`);
+  }
+  const entries = await res.json();
+  return entries;
 }
 
-export function addEntry(entry: UnsavedEntry): Entry {
-  const newEntry = {
-    ...entry,
-    entryId: data.nextEntryId++,
-  };
-  data.entries.unshift(newEntry);
-  return newEntry;
+export async function addEntry(entry: UnsavedEntry): Promise<void> {
+  const res = await fetch('/api/entries', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(entry),
+  });
+  if (!res.ok) {
+    throw new Error(`Error, failed to fetch ${res.status}`);
+  }
 }
 
-export function updateEntry(entry: Entry): Entry {
-  const newEntries = data.entries.map((e) =>
-    e.entryId === entry.entryId ? entry : e
-  );
-  data.entries = newEntries;
+export async function updateEntry(entry: Entry): Promise<Entry> {
+  const res = await fetch(`/api/entries/${entry.entryId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(entry),
+  });
+  if (!res.ok) {
+    throw new Error(`Error, failed to fetch ${res.status}`);
+  }
   return entry;
 }
 
-export function removeEntry(entryId: number): void {
-  const updatedArray = data.entries.filter(
-    (entry) => entry.entryId !== entryId
-  );
-  data.entries = updatedArray;
+export async function removeEntry(entryId: number): Promise<void> {
+  const res = await fetch(`/api/entries/${entryId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`Error, failed to fetch ${res.status}`);
+  }
 }
